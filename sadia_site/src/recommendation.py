@@ -6,7 +6,7 @@ class ChargementDonnees:
         self.evaluations = None
         self.films = None
 
-    def charger_movielens(self, chemin_donnees="../data/ml-latest-small"):
+    def charger_movielens(self, chemin_donnees="../../data/ml-latest-small"):
         try:
             self.evaluations = pd.read_csv(f"{chemin_donnees}/ratings.csv")
             self.films = pd.read_csv(f"{chemin_donnees}/movies.csv")
