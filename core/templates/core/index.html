@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Catalogue de films</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f4f4f4; }
+    .rating-form { display: inline-block; }
+  </style>
+</head>
+<body>
+  <h1>Films</h1>
+  <p>Liste des films (issue du dataset si disponible). Vous pouvez noter un film de 1 à 5.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Titre</th>
+        <th>Moyenne</th>
+        <th>Votes</th>
+        <th>Noter</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in films %}
+      <tr>
+        <td>{{ f.title }}</td>
+        <td>{% if f.avg %}{{ f.avg }}{% else %}-{% endif %}</td>
+        <td>{{ f.count }}</td>
+        <td>
+          <form class="rating-form" action="{% url 'rate' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="movie_id" value="{{ f.movieId }}">
+            <input type="hidden" name="title" value="{{ f.title }}">
+            <select name="rating">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+            </select>
+            <button type="submit">Envoyer</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
+

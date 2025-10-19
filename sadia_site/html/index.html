@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlickFlow - Unlimited Streaming</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#E50914',
+              secondary: '#221F1F',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&display=swap');
+
+      body {
+        font-family: 'Montserrat', sans-serif;
+      }
+
+      .hero-gradient {
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.9) 100%);
+      }
+
+      .logo-font {
+        font-family: 'Bebas Neue', cursive;
+      }
+
+      .scroll-container {
+        scrollbar-width: none;
+      }
+
+      .scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .movie-card:hover .movie-info {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+</head>
+<body class="bg-secondary text-white">
+    <div id="vanta-bg" class="fixed inset-0 -z-10"></div>
+
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-b from-black to-transparent px-4 py-4 md:px-16 fixed w-full z-50">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <h1 class="logo-font text-primary text-4xl mr-8">FLICKFLOW</h1>
+          <div class="hidden md:flex space-x-6">
+            <a href="#" class="hover:text-primary transition">Home</a>
+            <a href="#" class="hover:text-primary transition">TV Shows</a>
+            <a href="#" class="hover:text-primary transition">Movies</a>
+            <a href="#" class="hover:text-primary transition">New & Popular</a>
+            <a href="#" class="hover:text-primary transition">My List</a>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <i data-feather="search" class="cursor-pointer hover:text-primary"></i>
+          <i data-feather="bell" class="cursor-pointer hover:text-primary"></i>
+          <div class="w-8 h-8 rounded bg-primary flex items-center justify-center cursor-pointer">
+            <i data-feather="user"></i>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen flex items-center hero-gradient">
+      <div class="container mx-auto px-4 md:px-16 z-10">
+        <div class="max-w-2xl">
+          <h1 class="text-4xl md:text-6xl font-bold mb-4">The Witcher: Blood Origin</h1>
+          <p class="text-lg mb-6">Before Geralt of Rivia, there was the first Witcher. Explore the creation of the prototype monster slayers in this fantasy prequel.</p>
+          <div class="flex space-x-4">
+            <button class="bg-primary hover:bg-primary/90 px-6 py-3 rounded flex items-center">
+              <i data-feather="play" class="mr-2"></i> Play
+            </button>
+            <button class="bg-gray-600/70 hover:bg-gray-600/90 px-6 py-3 rounded flex items-center">
+              <i data-feather="info" class="mr-2"></i> More Info
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+<!-- Films Section -->
+<section class="py-12 bg-gradient-to-b from-black via-secondary to-black">
+  <div class="container mx-auto px-4 space-y-12">
+    <h2 class="text-2xl mb-4 text-white">Films disponibles</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {% for film in films %}
+      <div class="movie-card bg-gray-800 p-4 rounded">
+        <h3 class="text-lg font-bold">{{ film.title }}</h3>
+        <p>Moyenne: {{ film.avg|default:"N/A" }}</p>
+        <p>Votes: {{ film.count }}</p>
+        <form action="/rate/" method="POST" class="mt-2">
+          <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+          <input type="hidden" name="movie_id" value="{{ film.movieId }}">
+          <input type="hidden" name="title" value="{{ film.title }}">
+          <label for="rating_{{ film.movieId }}">Votre note:</label>
+          <select name="rating" id="rating_{{ film.movieId }}" class="bg-gray-700 text-white rounded">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+          <button type="submit" class="bg-primary text-white px-4 py-2 rounded mt-2">Noter</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<div class="text-center mt-4">
+    <a href="/recommendations/" class="bg-primary text-white px-6 py-3 rounded hover:bg-primary/90">Voir les recommandations</a>
+</div>
+    <!-- Content Rows -->
+    <section class="py-12 bg-gradient-to-b from-black via-secondary to-black">
+      <div class="container mx-auto px-4 space-y-12">
+        <!-- Trending Now -->
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold mb-4">Trending Now</h2>
+          <div class="relative">
+            <div class="flex overflow-x-scroll scroll-container space-x-4 pb-4">
+              <!-- Movie Cards -->
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/1" alt="Movie" class="w-full h-full object-cover">
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Cyberpunk 2077</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">89% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">2h 15m</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Repeat movie cards -->
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/2" alt="Movie" class="w-full h-full object-cover">
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Digital Dreams</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">92% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">1h 48m</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/3" alt="Movie" class="w-full h-full object-cover">
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Code Breakers</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">87% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">2h 5m</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/4" alt="Movie" class="w-full h-full object-cover">
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">AI Revolution</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">94% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">1h 56m</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/5" alt="Movie" class="w-full h-full object-cover">
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Neon Future</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">91% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">2h 22m</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Continue Watching -->
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold mb-4">Continue Watching</h2>
+          <div class="relative">
+            <div class="flex overflow-x-scroll scroll-container space-x-4 pb-4">
+              <!-- Movie Cards with progress bars -->
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/6" alt="Movie" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-600">
+                  <div class="h-full bg-primary" style="width: 65%"></div>
+                </div>
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Continue: 65%</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">85% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">1h 32m left</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Repeat continue watching cards -->
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/7" alt="Movie" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-600">
+                  <div class="h-full bg-primary" style="width: 42%"></div>
+                </div>
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Continue: 42%</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">78% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">2h 10m left</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/8" alt="Movie" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-600">
+                  <div class="h-full bg-primary" style="width: 23%"></div>
+                </div>
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Continue: 23%</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">91% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">1h 45m left</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/9" alt="Movie" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-600">
+                  <div class="h-full bg-primary" style="width: 87%"></div>
+                </div>
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Continue: 87%</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">93% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">25m left</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- My List -->
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold mb-4">My List</h2>
+          <div class="relative">
+            <div class="flex overflow-x-scroll scroll-container space-x-4 pb-4">
+              <!-- My List Cards -->
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/10" alt="Movie" class="w-full h-full object-cover">
+                <div class="absolute top-2 right-2 p-2 bg-black/60 rounded-full hover:bg-primary transition">
+                  <i data-feather="x" class="w-4 h-4"></i>
+                </div>
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Silicon Valley</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">95% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">Season 4</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Repeat my list cards -->
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/11" alt="Movie" class="w-full h-full object-cover">
+                <div class="absolute top-2 right-2 p-2 bg-black/60 rounded-full hover:bg-primary transition">
+                  <i data-feather="x" class="w-4 h-4"></i>
+                </div>
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">The Social Network</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">89% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">2h 01m</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/12" alt="Movie" class="w-full h-full object-cover">
+                <div class="absolute top-2 right-2 p-2 bg-black/60 rounded-full hover:bg-primary transition">
+                  <i data-feather="x" class="w-4 h-4"></i>
+                </div>
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">Black Mirror</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">97% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">Season 5</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+                <img src="http://static.photos/technology/320x240/13" alt="Movie" class="w-full h-full object-cover">
+                <div class="absolute top-2 right-2 p-2 bg-black/60 rounded-full hover:bg-primary transition">
+                  <i data-feather="x" class="w-4 h-4"></i>
+                </div>
+                <div class="movie-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
+                  <h3 class="font-bold">The Matrix</h3>
+                  <div class="flex items-center mt-2">
+                    <span class="text-sm text-primary">99% Match</span>
+                    <span class="mx-2">•</span>
+                    <span class="text-sm">2h 16m</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+      <div class="container mx-auto px-4 md:px-16">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-gray-400 mb-4">Navigation</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-primary transition">Home</a></li>
+              <li><a href="#" class="hover:text-primary transition">TV Shows</a></li>
+              <li><a href="#" class="hover:text-primary transition">Movies</a></li>
+              <li><a href="#" class="hover:text-primary transition">New & Popular</a></li>
+              <li><a href="#" class="hover:text-primary transition">My List</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-gray-400 mb-4">Legal</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-primary transition">Privacy Policy</a></li>
+              <li><a href="#" class="hover:text-primary transition">Terms of Service</a></li>
+              <li><a href="#" class="hover:text-primary transition">Cookie Preferences</a></li>
+              <li><a href="#" class="hover:text-primary transition">Corporate Information</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-gray-400 mb-4">Account</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-primary transition">Manage Profile</a></li>
+              <li><a href="#" class="hover:text-primary transition">Account Settings</a></li>
+              <li><a href="#" class="hover:text-primary transition">Help Center</a></li>
+              <li><a href="#" class="hover:text-primary transition">Sign Out</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-gray-400 mb-4">Connect</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-primary transition">Facebook</a></li>
+              <li><a href="#" class="hover:text-primary transition">Instagram</a></li>
+              <li><a href="#" class="hover:text-primary transition">Twitter</a></li>
+              <li><a href="#" class="hover:text-primary transition">YouTube</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-12 pt-8 border-t border-gray-800">
+          <p class="text-gray-400 text-sm">© 2023 FlickFlow. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Initialize Vanta.js background
+      VANTA.NET({
+        el: "#vanta-bg",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0xe50914,
+        backgroundColor: 0x221f1f,
+        points: 10.00,
+        maxDistance: 20.00,
+        spacing: 15.00
+      });
+
+      // Initialize feather icons
+      feather.replace();
+    </script>
+</body>
+</html>
