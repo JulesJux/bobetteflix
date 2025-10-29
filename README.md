@@ -1,6 +1,4 @@
-# sadia
-
-Projet Django initialisé.
+# Bobetteflix
 
 Prerequis
 - Python 3.8+
@@ -9,7 +7,6 @@ Prerequis
 Quickstart
 
 ```bash
-# depuis le répertoire /home/jules/Documents/sadia
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
@@ -22,4 +19,3 @@ Fichiers importants
 - `sadia_site/` - package du projet (settings, urls, wsgi, asgi)
 
 Prochaine étape suggérée : créer une app via `python manage.py startapp <nom>` et l'ajouter à `INSTALLED_APPS`.
-# bobetteflix

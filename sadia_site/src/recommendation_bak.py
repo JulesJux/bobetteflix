@@ -1,29 +1,23 @@
 import numpy as np
 import pandas as pd
-from itertools import combinations
-from collections import Counter
-
-# --------------------------------------------
-# 1. Chargement et nettoyage des données
-# --------------------------------------------
 
 class ChargementDonnees:
     def __init__(self):
         self.evaluations = None
         self.films = None
 
-    def charger_movielens(self, chemin_donnees="data/ml-latest-small"):
+    def charger_movielens(self, chemin_donnees="../../data/ml-latest-small"):
         try:
             self.evaluations = pd.read_csv('/home/jjjux/bobetteflix/data/ml-latest-small/ratings.csv')
             self.films = pd.read_csv('/home/jjjux/bobetteflix/data/ml-latest-small/movies.csv')
             self._nettoyer_donnees()
         except FileNotFoundError:
-            print("Fichiers non trouvés")
+            print("Fichiers non trouvÃ©s")
             return False
         return True
 
     def _nettoyer_donnees(self):
-        self.evaluations = self.evaluations[self.evaluations['rating'] >= 4.0].copy()
+        self.evaluations = self.evaluations[self.evaluations['rating'] >= 4.0]
         self.evaluations['id_utilisateur'] = pd.Categorical(self.evaluations['userId']).codes
         self.evaluations['id_film'] = pd.Categorical(self.evaluations['movieId']).codes
 
@@ -31,10 +25,6 @@ class ChargementDonnees:
 chargement = ChargementDonnees()
 chargement.charger_movielens()
 
-
-# --------------------------------------------
-# 2. Construction du graphe (optimisé)
-# --------------------------------------------
 
 class ConstructionGraphe:
     def __init__(self, evaluations):
@@ -44,36 +34,33 @@ class ConstructionGraphe:
         self.matrice_transition = None
 
     def construire_matrice_transition(self):
-        cooccurrences = Counter()
+        similarite_films = np.zeros((self.nb_films, self.nb_films))
 
-        for _, group in self.evaluations.groupby('id_utilisateur'):
-            films = group['id_film'].values
-            for i, j in combinations(films, 2):
-                cooccurrences[(i, j)] += 1
-                cooccurrences[(j, i)] += 1  # rendre symétrique
+        for id_utilisateur in range(self.nb_utilisateurs):
+            evaluations_utilisateur = self.evaluations[self.evaluations['id_utilisateur'] == id_utilisateur]
+            films_aimes = evaluations_utilisateur['id_film'].values
 
-        similarite_films = np.zeros((self.nb_films, self.nb_films), dtype=np.float32)
-        for (i, j), count in cooccurrences.items():
-            similarite_films[i, j] = count
+            if len(films_aimes) > 1:
+                for i in range(len(films_aimes)):
+                    for j in range(len(films_aimes)):
+                        if i != j:
+                            similarite_films[films_aimes[i], films_aimes[j]] += 1
 
-        # Normalisation ligne par ligne
-        somme_lignes = similarite_films.sum(axis=1, keepdims=True)
-        with np.errstate(divide='ignore', invalid='ignore'):
-            self.matrice_transition = np.divide(similarite_films, somme_lignes, where=somme_lignes != 0)
-            self.matrice_transition[somme_lignes[:, 0] == 0] = 1.0 / self.nb_films
+        self.matrice_transition = np.zeros((self.nb_films, self.nb_films))
+        for i in range(self.nb_films):
+            somme_ligne = np.sum(similarite_films[i])
+            if somme_ligne > 0:
+                self.matrice_transition[i] = similarite_films[i] / somme_ligne
+            else:
+                self.matrice_transition[i] = np.ones(self.nb_films) / self.nb_films
 
         return self.matrice_transition
 
 
-# Construction du graphe
 if chargement.evaluations is not None:
     construction = ConstructionGraphe(chargement.evaluations)
     matrice_P = construction.construire_matrice_transition()
 
-
-# --------------------------------------------
-# 3. Recommandation par marche aléatoire (optimisée)
-# --------------------------------------------
 
 class RecommandationMarcheAleatoire:
     def __init__(self, matrice_transition):
@@ -84,25 +71,23 @@ class RecommandationMarcheAleatoire:
         scores = np.zeros(self.nb_films)
         for film in films_depart:
             scores[film] = 1 / len(films_depart)
-
         for iteration in range(iterations_max):
-            nouveaux_scores = self.matrice_transition.T @ scores  # Vectorisé
+            nouveaux_scores = np.zeros(self.nb_films)
+            for i in range(self.nb_films):
+                if scores[i] > 0:
+                    for j in range(self.nb_films):
+                        if self.matrice_transition[i, j] > 0:
+                            nouveaux_scores[j] += self.matrice_transition[i, j] * scores[i]
             changement = np.sum(np.abs(nouveaux_scores - scores))
-            scores = nouveaux_scores
+            scores = nouveaux_scores.copy()
 
             if iteration % 100 == 0:
                 top_films = np.argsort(scores)[-3:][::-1]
-
-            if changement < 1e-8:
-                print(f"✓ Convergence à l'itération {iteration}")
+            if changement < 1e-8:  # Convergence
+                print(f"âœ“ Convergence Ã  l'itÃ©ration {iteration}")
                 break
-
         return scores
 
-
-# --------------------------------------------
-# 4. Métriques d’évaluation (inchangé)
-# --------------------------------------------
 
 class MetriquesEvaluation:
     def __init__(self, evaluations):

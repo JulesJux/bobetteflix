@@ -8,6 +8,42 @@ from django.middleware.csrf import get_token
 from .models import Rating
 from sadia_site.src.recommendation import ChargementDonnees, ConstructionGraphe
 
+def _dedupe_recommendations_list(recs, keys=('movieId', 'movie_id', 'id_film', 'id')):
+    """Déduplique une liste de dictionnaires en préservant l'ordre.
+    Cherche l'identifiant du film dans les clés fournies.
+    Retourne la liste dédupliquée.
+    """
+    seen = set()
+    deduped = []
+    for r in recs:
+        if not isinstance(r, dict):
+            # si l'élément n'est pas un dict, on l'inclut tel quel
+            deduped.append(r)
+            continue
+        # chercher une clé id utilisable
+        film_id = None
+        for k in keys:
+            if k in r and r[k] is not None:
+                film_id = r[k]
+                break
+        # normaliser les types (numpy types -> int)
+        try:
+            if film_id is not None:
+                film_id = int(film_id)
+        except Exception:
+            pass
+        if film_id is None:
+            # pas d'identifiant, inclure une seule fois en se basant sur l'objet dict string
+            key = tuple(sorted(r.items()))
+            if key not in seen:
+                seen.add(key)
+                deduped.append(r)
+        else:
+            if film_id not in seen:
+                seen.add(film_id)
+                deduped.append(r)
+    return deduped
+
 def _lire_films():
     movies_path = Path(settings.BASE_DIR) / 'data' / 'ml-latest-small' / 'movies.csv'
     films = []
@@ -92,4 +128,5 @@ def recommander_films(request):
             indices_recommandes = scores.argsort()[-5:][::-1]  # Top 5 recommandations
             films_recommandes.extend(chargement.films.iloc[indices_recommandes].to_dict('records'))
 
+    films_recommandes = _dedupe_recommendations_list(films_recommandes)
     return render(request, 'html/recommendations.html', {'films_recommandes': films_recommandes})
