@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bobetteflix</title>
+    <link rel="icon" type="image/x-icon" href="/static/icon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#E50914',
+              secondary: '#221F1F',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&display=swap');
+
+      body {
+        font-family: 'Montserrat', sans-serif;
+      }
+
+      .hero-gradient {
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.9) 100%);
+      }
+
+      .logo-font {
+        font-family: 'Bebas Neue', cursive;
+      }
+
+      .scroll-container {
+        scrollbar-width: none;
+      }
+
+      .scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .movie-card:hover .movie-info {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+</head>
+<body class="bg-secondary text-white">
+    <div id="vanta-bg" class="fixed inset-0 -z-10"></div>
+
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-b from-black to-transparent px-4 py-4 md:px-16 fixed w-full z-50">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <h1 class="logo-font text-primary text-4xl mr-8">BOBETTEFLIX</h1>
+          <div class="hidden md:flex space-x-6">
+            <a href="{% url 'home' %}" class="hover:text-primary transition">Home</a>
+            <a href="#" class="hover:text-primary transition">TV Shows</a>
+            <a href="#" class="hover:text-primary transition">Movies</a>
+            <a href="#" class="hover:text-primary transition">New & Popular</a>
+            <a href="#" class="hover:text-primary transition">My List</a>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <i data-feather="search" class="cursor-pointer hover:text-primary"></i>
+          <i data-feather="bell" class="cursor-pointer hover:text-primary"></i>
+          <div class="w-8 h-8 rounded bg-primary flex items-center justify-center cursor-pointer">
+              <a href="/admin/" class="w-8 h-8 rounded bg-primary flex items-center justify-center cursor-pointer">
+                <i data-feather="user"></i>
+              </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+ <section class="py-12 bg-gradient-to-b from-black via-secondary to-black">
+           <div class="container mx-auto px-4 md:px-16 my-20">
+               <h2 class="text-4xl font-bold mb-4">About Bobetteflix</h2>
+                 <p class="text-lg mb-6">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+           </div>
+     <img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg" alt="TMDB Logo" class="w-32 mx-auto mb-12">
+ </section>
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+      <div class="container mx-auto px-4 md:px-16">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-gray-400 mb-4">Navigation</h3>
+            <ul class="space-y-2">
+              <li><a href="{% url 'home' %}" class="hover:text-primary transition">Home</a></li>
+              <li><a href="#" class="hover:text-primary transition">TV Shows</a></li>
+              <li><a href="#" class="hover:text-primary transition">Movies</a></li>
+              <li><a href="#" class="hover:text-primary transition">New & Popular</a></li>
+              <li><a href="#" class="hover:text-primary transition">My List</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-gray-400 mb-4">Legal</h3>
+            <ul class="space-y-2">
+              <li><a href="{% url 'about' %}" class="hover:text-primary transition">About</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-gray-400 mb-4">Account</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-primary transition">Manage Profile</a></li>
+              <li><a href="#" class="hover:text-primary transition">Account Settings</a></li>
+              <li><a href="#" class="hover:text-primary transition">Help Center</a></li>
+              <li><a href="#" class="hover:text-primary transition">Sign Out</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-gray-400 mb-4">Connect</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-primary transition">Facebook</a></li>
+              <li><a href="#" class="hover:text-primary transition">Instagram</a></li>
+              <li><a href="#" class="hover:text-primary transition">Twitter</a></li>
+              <li><a href="#" class="hover:text-primary transition">YouTube</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Initialize Vanta.js background
+      VANTA.NET({
+        el: "#vanta-bg",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0xe50914,
+        backgroundColor: 0x221f1f,
+        points: 10.00,
+        maxDistance: 20.00,
+        spacing: 15.00
+      });
+
+      // Initialize feather icons
+      feather.replace();
+    </script>
+</body>
+</html>
