@@ -78,7 +78,7 @@
       </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Section -
     <section class="relative h-screen flex items-center hero-gradient">
       <div class="container mx-auto px-4 md:px-16 z-10">
         <div class="max-w-2xl">
@@ -94,18 +94,19 @@
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
 <!-- Films Section -->
  <section class="py-12 bg-gradient-to-b from-black via-secondary to-black">
       <div class="container mx-auto px-4 space-y-12">
   <div>
-          <h2 class="text-xl md:text-2xl font-bold mb-4">Trending Now</h2>
+          <h2 class="text-xl md:text-2xl font-bold mb-4 my-20">Trending Now</h2>
           <div class="relative">
               <div class="flex overflow-x-scroll scroll-container space-x-4 pb-4">
       {% for film in films %}
       <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
-          <img src="{{ film.poster_url }}" alt="{{ film.title }}"class="w-full h-full object-cover absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent">
-          <div class="movie-info absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 ">
+          <img src="{{ film.poster_url }}" alt="{{ film.title }}"class="w-full h-full object-cover absolute">
+          <div class="inset-0 bg-gradient-to-t from-black via-black/70 to-transparent z-40"></div>
+          <div class="movie-info absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4">
         <h3 class="text-lg font-bold">{{ film.title }}</h3>
         <p>Moyenne: {{ film.avg|default:"N/A" }}</p>
         <p>Votes: {{ film.count }}</p>
@@ -134,17 +135,15 @@
   </div>
   </div>
   </div>
-      </div>
-</section>
-<div class="text-center mt-4">
+      <div class="text-center mt-4 my-5">
     <a href="{% url 'recommendations' %}" class="bg-primary text-white px-6 py-3 rounded hover:bg-primary/90">Voir les recommandations</a>
 </div>
-    <!-- Content Rows -->
-    <section class="py-12 bg-gradient-to-b from-black via-secondary to-black">
+      </div>
+    <div class="my-20">
       <div class="container mx-auto px-4 space-y-12">
         <!-- Trending Now -->
         <div>
-          <h2 class="text-xl md:text-2xl font-bold mb-4">Trending Now</h2>
+          <h2 class="text-xl md:text-2xl font-bold mb-4">Other films</h2>
           <div class="relative">
             <div class="flex overflow-x-scroll scroll-container space-x-4 pb-4">
               <!-- Movie Cards -->
@@ -352,7 +351,8 @@
           </div>
         </div>
       </div>
-    </section>
+    </div>
+ </section>
 
     <!-- Footer -->
     <footer class="bg-black py-12">
