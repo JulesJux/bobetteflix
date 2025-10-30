@@ -59,7 +59,7 @@
         <div class="flex items-center">
           <h1 class="logo-font text-primary text-4xl mr-8">BOBETTEFLIX</h1>
           <div class="hidden md:flex space-x-6">
-            <a href="#" class="hover:text-primary transition">Home</a>
+            <a href="{% url 'home' %}" class="hover:text-primary transition">Home</a>
             <a href="#" class="hover:text-primary transition">TV Shows</a>
             <a href="#" class="hover:text-primary transition">Movies</a>
             <a href="#" class="hover:text-primary transition">New & Popular</a>
@@ -361,7 +361,7 @@
           <div>
             <h3 class="text-gray-400 mb-4">Navigation</h3>
             <ul class="space-y-2">
-              <li><a href="#" class="hover:text-primary transition">Home</a></li>
+              <li><a href="{% url 'home' %}" class="hover:text-primary transition">Home</a></li>
               <li><a href="#" class="hover:text-primary transition">TV Shows</a></li>
               <li><a href="#" class="hover:text-primary transition">Movies</a></li>
               <li><a href="#" class="hover:text-primary transition">New & Popular</a></li>
@@ -371,10 +371,7 @@
           <div>
             <h3 class="text-gray-400 mb-4">Legal</h3>
             <ul class="space-y-2">
-              <li><a href="#" class="hover:text-primary transition">Privacy Policy</a></li>
-              <li><a href="#" class="hover:text-primary transition">Terms of Service</a></li>
-              <li><a href="#" class="hover:text-primary transition">Cookie Preferences</a></li>
-              <li><a href="#" class="hover:text-primary transition">Corporate Information</a></li>
+              <li><a href="{% url 'about' %}" class="hover:text-primary transition">About</a></li>
             </ul>
           </div>
           <div>
@@ -395,9 +392,6 @@
               <li><a href="#" class="hover:text-primary transition">YouTube</a></li>
             </ul>
           </div>
-        </div>
-        <div class="mt-12 pt-8 border-t border-gray-800">
-          <p class="text-gray-400 text-sm">© 2023 FlickFlow. All rights reserved.</p>
         </div>
       </div>
     </footer>

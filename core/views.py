@@ -16,6 +16,9 @@ TMDB_TRENDING_URL = "https://api.themoviedb.org/3/trending/movie/day"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
 _poster_cache = {}
 
+def about(request):
+    return render(request, "html/about.html")
+
 def _clean_title(title):
     """Supprime l’année entre parenthèses à la fin du titre (sans regex)."""
     if not title:
@@ -186,7 +189,7 @@ def home(request):
         'has_more': has_more,
         'total_films': total,
     }
-    return render(request, 'html/index.html', context)
+    return render(request, 'html/home.html', context)
 
 
 def rate(request):
@@ -209,7 +212,7 @@ def recommander_films(request):
     chargement = ChargementDonnees()
     chemin_donnees = "data/ml-latest-small"
     if not chargement.charger_movielens(chemin_donnees):
-        return render(request, 'html/index.html', {'error': 'Impossible de charger les données'})
+        return render(request, 'html/home.html', {'error': 'Impossible de charger les données'})
 
     # Construire la matrice de transition
     graphe = ConstructionGraphe(chargement.evaluations)
