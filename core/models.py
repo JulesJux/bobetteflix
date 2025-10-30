@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Rating(models.Model):
     movie_id = models.IntegerField(db_index=True)
     title = models.CharField(max_length=200, blank=True)

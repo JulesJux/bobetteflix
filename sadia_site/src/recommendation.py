@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 from itertools import combinations
 from collections import Counter
+from django.conf import settings
+from pathlib import Path
+
 
 # --------------------------------------------
 # 1. Chargement et nettoyage des données
@@ -14,8 +17,8 @@ class ChargementDonnees:
 
     def charger_movielens(self, chemin_donnees="data/ml-latest-small"):
         try:
-            self.evaluations = pd.read_csv('/home/jjjux/bobetteflix/data/ml-latest-small/ratings.csv')
-            self.films = pd.read_csv('/home/jjjux/bobetteflix/data/ml-latest-small/movies.csv')
+            self.evaluations = pd.read_csv(Path(settings.BASE_DIR) / 'data' / 'ml-latest-small' / 'ratings.csv')
+            self.films = pd.read_csv(Path(settings.BASE_DIR) / 'data' / 'ml-latest-small' / 'movies.csv')
             self._nettoyer_donnees()
         except FileNotFoundError:
             print("Fichiers non trouvés")

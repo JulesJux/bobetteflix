@@ -3,5 +3,5 @@ asgiref==3.10.0
 sqlparse==0.5.3
 numpy
 pandas
-# Optional: add other dependencies here
+requests
 

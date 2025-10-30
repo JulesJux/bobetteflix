@@ -2,11 +2,88 @@ from django.conf import settings
 from django.shortcuts import render, redirect
 from pathlib import Path
 import csv
+import os
+import requests
 from django.db.models import Avg, Count
 from django.middleware.csrf import get_token
 
 from .models import Rating
 from sadia_site.src.recommendation import ChargementDonnees, ConstructionGraphe
+
+TMDB_API_KEY = os.environ.get("TMDB_API_KEY")
+TMDB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie"
+TMDB_TRENDING_URL = "https://api.themoviedb.org/3/trending/movie/day"
+TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
+_poster_cache = {}
+
+def _clean_title(title):
+    """Supprime l’année entre parenthèses à la fin du titre (sans regex)."""
+    if not title:
+        return title
+
+    pos = title.rfind('(')
+    if pos != -1 and title.endswith(')'):
+        inside = title[pos+1:-1]
+        # Vérifie si c’est bien une année (ex: '1999')
+        if len(inside) == 4 and inside.isdigit():
+            return title[:pos].strip()
+    return title.strip()
+
+
+def _extract_year(title):
+    """Retourne l’année si elle est présente à la fin du titre."""
+    if not title:
+        return None
+    pos = title.rfind('(')
+    if pos != -1 and title.endswith(')'):
+        inside = title[pos+1:-1]
+        if len(inside) == 4 and inside.isdigit():
+            return int(inside)
+    return None
+
+def _get_poster_from_tmdb(title):
+    """Recherche un film par titre sur TMDB et retourne l’URL du poster s’il existe, avec cache."""
+    if not TMDB_API_KEY:
+        return None
+
+    clean_title = _clean_title(title)
+    year = _extract_year(title)
+    cache_key = clean_title + (f" ({year})" if year else "")
+
+    # 🔹 Vérifie si on a déjà ce film en cache
+    if cache_key in _poster_cache:
+        return _poster_cache[cache_key]
+
+    params = {
+        "api_key": TMDB_API_KEY,
+        "query": clean_title,
+        "language": "fr-FR",
+    }
+    if year:
+        params["year"] = year
+
+    try:
+        response = requests.get(TMDB_SEARCH_URL, params=params, timeout=5)
+        if response.status_code != 200:
+            _poster_cache[cache_key] = None
+            return None
+        data = response.json()
+        results = data.get("results") or []
+        if not results:
+            _poster_cache[cache_key] = None
+            return None
+        poster_path = results[0].get("poster_path")
+        if poster_path:
+            poster_url = TMDB_IMAGE_BASE + poster_path
+            _poster_cache[cache_key] = poster_url
+            return poster_url
+        _poster_cache[cache_key] = None
+    except Exception as e:
+        print("Erreur TMDB pour", title, ":", e)
+        _poster_cache[cache_key] = None
+
+    return None
+
 
 def _dedupe_recommendations_list(recs, keys=('movieId', 'movie_id', 'id_film', 'id')):
     """Déduplique une liste de dictionnaires en préservant l'ordre.
@@ -86,8 +163,29 @@ def home(request):
             f['avg'] = None
             f['count'] = 0
 
-    # limit number of films shown for performance (e.g., first 50)
-    context = {'films': films[:50]}
+    try:
+        page_size = int(request.GET.get('page_size', 12))
+        if page_size <= 0:
+            page_size = 12
+    except ValueError:
+        page_size = 12
+
+    for i in range (0, page_size):
+        films[i]['poster_url'] = _get_poster_from_tmdb(_clean_title(films[i]['title']))
+
+    start = 0
+    end = start + page_size
+
+    total = len(films)
+    page_films = films[start:end]
+
+    has_more = end < total
+    context = {
+        'films': page_films,
+        'page_size': page_size,
+        'has_more': has_more,
+        'total_films': total,
+    }
     return render(request, 'html/index.html', context)
 
 
@@ -101,7 +199,6 @@ def rate(request):
         if rating_value < 1 or rating_value > 5:
             raise ValueError('rating out of range')
     except Exception:
-        # invalid data -> redirect back
         return redirect('home')
 
     Rating.objects.create(movie_id=movie_id, title=title, rating=rating_value)

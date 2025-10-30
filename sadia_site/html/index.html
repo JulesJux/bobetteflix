@@ -96,12 +96,16 @@
       </div>
     </section>
 <!-- Films Section -->
-<section class="py-12 bg-gradient-to-b from-black via-secondary to-black">
-  <div class="container mx-auto px-4 space-y-12">
-    <h2 class="text-2xl mb-4 text-white">Films disponibles</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+ <section class="py-12 bg-gradient-to-b from-black via-secondary to-black">
+      <div class="container mx-auto px-4 space-y-12">
+  <div>
+          <h2 class="text-xl md:text-2xl font-bold mb-4">Trending Now</h2>
+          <div class="relative">
+              <div class="flex overflow-x-scroll scroll-container space-x-4 pb-4">
       {% for film in films %}
-      <div class="movie-card bg-gray-800 p-4 rounded">
+      <div class="movie-card flex-none w-48 h-72 rounded-lg bg-gray-800 relative overflow-hidden group">
+          <img src="{{ film.poster_url }}" alt="{{ film.title }}"class="w-full h-full object-cover absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent">
+          <div class="movie-info absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 ">
         <h3 class="text-lg font-bold">{{ film.title }}</h3>
         <p>Moyenne: {{ film.avg|default:"N/A" }}</p>
         <p>Votes: {{ film.count }}</p>
@@ -120,9 +124,17 @@
           <button type="submit" class="bg-primary text-white px-4 py-2 rounded mt-2">Noter</button>
         </form>
       </div>
+      </div>
       {% endfor %}
     </div>
+  <div class="text-center mt-6">
+    <a href="?page_size={{ page_size|add:page_size}}" class="bg-primary text-white px-6 py-2 rounded hover:bg-primary/90">
+      Afficher plus
+    </a>
   </div>
+  </div>
+  </div>
+      </div>
 </section>
 <div class="text-center mt-4">
     <a href="{% url 'recommendations' %}" class="bg-primary text-white px-6 py-3 rounded hover:bg-primary/90">Voir les recommandations</a>
